@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WASM-RARHash</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/@codolog/form@1.0.0/dist/form.min.css" />
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <form>
+            <div>
+                <div>
+                    <label class="form">RAR Input</label>
+                    <input id="upload" class="form" type="file" />
+                </div>
+                <div>
+                    <button id="uploadButton" class="form full" >Analyze</button>
+                </div>
+                <br/>
+                <br/>
+                <div>
+                    <label class="form">Output</label>
+                    <textarea id="output" class="form" readonly placeholder="Output"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script type="module">
+        import { default as loadWasm, execute_analyzer } from "./pkg/WebRarFuckery.js";
+
+        const upload = document.getElementById("upload");
+        const uploadButton = document.getElementById("uploadButton");
+        const output = document.getElementById("output");
+
+        loadWasm().then(() => {
+            console.log("Loaded WASM");
+            uploadButton.onclick = async (e) => {
+                e.preventDefault();
+                const blob = upload.files[0];
+
+                const url = URL.createObjectURL(blob);
+                const data = await fetch(url).then(res => res.arrayBuffer());
+                URL.revokeObjectURL(blob);
+
+                const data_view = new Uint8Array(data);
+
+                output.value = execute_analyzer(data_view);
+            };
+        });
+    </script>
+</body>
+</html>
