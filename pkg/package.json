@@ -1,0 +1,18 @@
+{
+  "name": "wasm-khash",
+  "collaborators": [
+    "Pascal K."
+  ],
+  "description": "Extracting hashes from rar and zip files",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "wasm_khash_bg.wasm",
+    "wasm_khash.js",
+    "wasm_khash.d.ts",
+    "LICENSE_MIT"
+  ],
+  "module": "wasm_khash.js",
+  "types": "wasm_khash.d.ts",
+  "sideEffects": false
+}
