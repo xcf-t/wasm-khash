@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WASM-RARHash</title>
+    <title>WASM-KHash</title>
 
     <link rel="stylesheet" href="https://unpkg.com/@codolog/form@1.0.0/dist/form.min.css" />
     <link rel="stylesheet" href="assets/style.css">
@@ -68,6 +68,8 @@
                         output.value = execute_rar_analyzer(data_view);
                         break;
                 }
+
+                if (output.value === "") output.value = "No hashes found";
             };
         });
     </script>
