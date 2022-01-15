@@ -13,7 +13,11 @@
             <div>
                 <div>
                     <label class="form">RAR Input</label>
-                    <input id="upload" class="form" type="file" />
+                    <input id="uploadRar" class="form" type="file" />
+                </div>
+                <div>
+                    <label class="form">ZIP Input</label>
+                    <input id="uploadZip" class="form" type="file" />
                 </div>
                 <div>
                     <button id="uploadButton" class="form full" >Analyze</button>
@@ -28,25 +32,42 @@
         </form>
     </div>
     <script type="module">
-        import { default as loadWasm, execute_analyzer } from "./pkg/WebRarFuckery.js";
+        import { default as loadWasm, execute_rar_analyzer, execute_zip_analyzer } from "./pkg/wasm_khash.js";
 
-        const upload = document.getElementById("upload");
+        const uploadZip = document.getElementById("uploadZip");
+        const uploadRar = document.getElementById("uploadRar");
         const uploadButton = document.getElementById("uploadButton");
         const output = document.getElementById("output");
+
+        let mode;
 
         loadWasm().then(() => {
             console.log("Loaded WASM");
             uploadButton.onclick = async (e) => {
                 e.preventDefault();
-                const blob = upload.files[0];
+                let blob;
+                if (uploadZip.files[0]) {
+                    blob = uploadZip.files[0];
+                    mode = "zip";
+                } else {
+                    blob = uploadRar.files[0];
+                    mode = "rar";
+                }
+
 
                 const url = URL.createObjectURL(blob);
                 const data = await fetch(url).then(res => res.arrayBuffer());
                 URL.revokeObjectURL(blob);
 
                 const data_view = new Uint8Array(data);
-
-                output.value = execute_analyzer(data_view);
+                switch (mode) {
+                    case "zip":
+                        output.value = execute_zip_analyzer(data_view);
+                        break;
+                    case "rar":
+                        output.value = execute_rar_analyzer(data_view);
+                        break;
+                }
             };
         });
     </script>

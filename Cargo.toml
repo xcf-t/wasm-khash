@@ -1,8 +1,10 @@
 [package]
-name = "WebRarFuckery"
+name = "wasm-khash"
 version = "0.1.0"
-authors = ["xcf-t <pascal.kosak@gmail.com>"]
+authors = ["Pascal K."]
 edition = "2018"
+license = "MIT"
+description = "Extracting hashes from rar and zip files"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

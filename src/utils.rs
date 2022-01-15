@@ -1,22 +1,21 @@
 use std::borrow::Cow;
-use std::io::{Cursor, Read, Result};
+use std::io::{Cursor, Read, Result, Seek, SeekFrom};
 use std::fmt::Write;
 use crate::rar::Rar5ReaderState;
+use crate::zip::ZipReaderState;
 
 pub fn set_panic_hook() {
-    // When the `console_error_panic_hook` feature is enabled, we can call the
-    // `set_panic_hook` function at least once during initialization, and then
-    // we will get better error messages if our code ever panics.
-    //
-    // For more details see
-    // https://github.com/rustwasm/console_error_panic_hook#readme
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
 
 pub enum ProcessingResult {
     Rar5(Rar5ReaderState),
-    Zip,
+    Zip(ZipReaderState),
+}
+
+pub fn arch_index(x: u64) -> u32 {
+    x as u8 as u32
 }
 
 pub fn basename(path: &str, sep: char) -> Cow<str> {
@@ -67,4 +66,48 @@ pub fn read_var_int(cursor: &mut Cursor<Vec<u8>>) -> Result<(u64, u64)> {
     }
 
     return Ok((0, 0));
+}
+
+pub trait ReadHelper<T> where T: AsRef<[u8]> {
+    fn read_u8(&mut self) -> Result<u8>;
+    fn read_u16(&mut self) -> Result<u16>;
+    fn read_u32(&mut self) -> Result<u32>;
+    fn read_u64(&mut self) -> Result<u64>;
+    fn read_u8_eq(&mut self, value: &u8) -> Result<bool>;
+}
+
+impl<T> ReadHelper<T> for Cursor<T> where T: AsRef<[u8]> {
+    fn read_u8(&mut self) -> Result<u8> {
+        let mut buffer = [0u8; 1];
+        self.read_exact(&mut buffer)?;
+        Ok(u8::from_le_bytes(buffer))
+    }
+
+    fn read_u16(&mut self) -> Result<u16> {
+        let mut buffer = [0u8; 2];
+        self.read_exact(&mut buffer)?;
+        Ok(u16::from_le_bytes(buffer))
+    }
+
+    fn read_u32(&mut self) -> Result<u32> {
+        let mut buffer = [0u8; 4];
+        self.read_exact(&mut buffer)?;
+        Ok(u32::from_le_bytes(buffer))
+    }
+
+    fn read_u64(&mut self) -> Result<u64> {
+        let mut buffer = [0u8; 8];
+        self.read_exact(&mut buffer)?;
+        Ok(u64::from_le_bytes(buffer))
+    }
+
+    fn read_u8_eq(&mut self, value: &u8) -> Result<bool> {
+        let read = self.read_u8()?;
+        return if value.eq(&read) {
+            Ok(true)
+        } else {
+            self.seek(SeekFrom::Current(-1))?;
+            Ok(false)
+        }
+    }
 }

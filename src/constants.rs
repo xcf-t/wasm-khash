@@ -41,3 +41,10 @@ pub const FHEXTRA_SUBDATA: u64 = 0x07;
 // Flags for FHEXTRA_CRYPT.;
 pub const FHEXTRA_CRYPT_PSWCHECK: u64 = 0x01;
 pub const FHEXTRA_CRYPT_HASHMAC: u64 = 0x02;
+
+pub const FLAG_LOCAL_SIZE_UNKNOWN: u16 = 8;
+
+pub const HEXCHARS_LC: [char; 16] = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+
+pub const AES_AUTHENTICATION_CODE_LENGTH: u64 = 10;
+pub const AES_PASSWORD_VERIFICATION_LENGTH: u64 = 2;
